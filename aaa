@@ -1,6 +1,7 @@
 # Selezione delle colonne di interesse
 columns = ['Corrente (A)', 'Energia consumo (kWh)', 'Tensione (V)']
 
+
 data_to_use1 = data1[columns]
 data_to_use2 = data2[columns]
 data_to_use3 = data3[columns]
