@@ -1,0 +1,57 @@
+#Rappresenzazione delle anomalie sul grafico della corrente 
+
+#anomalie compressore1
+plt.figure(figsize=(20, 10))
+#plt.plot(data_to_use.index, data_to_use['Energia consumo (kWh)'], label='Corrente (A)')
+plt.plot(data_to_use1.index, data_to_use1['Corrente (A)'], label='Corrente (A)')
+
+#plt.scatter(data_to_use[data_to_use['Anomaly'] == -1].index, data_to_use[data_to_use['Anomaly'] == -1]['Energia consumo (kWh)'], color='red', label='Anomalie')
+plt.scatter(data_to_use1[data_to_use1['Anomaly1'] == -1].index, data_to_use1[data_to_use1['Anomaly1'] == -1]['Corrente (A)'], color='black', label='Anomalie')
+
+plt.title('Rilevamento delle Anomalie nella Corrente')
+plt.xlabel('Data')
+plt.ylabel('Corrente (A)')
+plt.legend()
+plt.show()
+
+#anomalie compressore 2
+plt.figure(figsize=(20, 10))
+#plt.plot(data_to_use.index, data_to_use['Energia consumo (kWh)'], label='Corrente (A)')
+plt.plot(data_to_use2.index, data_to_use2['Corrente (A)'], label='Corrente (A)')
+
+#plt.scatter(data_to_use[data_to_use['Anomaly'] == -1].index, data_to_use[data_to_use['Anomaly'] == -1]['Energia consumo (kWh)'], color='red', label='Anomalie')
+plt.scatter(data_to_use2[data_to_use2['Anomaly2'] == -1].index, data_to_use2[data_to_use2['Anomaly2'] == -1]['Corrente (A)'], color='black', label='Anomalie')
+
+plt.title('Rilevamento delle Anomalie nella Corrente')
+plt.xlabel('Data')
+plt.ylabel('Corrente (A)')
+plt.legend()
+plt.show()
+
+#anomalie compressore 3
+plt.figure(figsize=(20, 10))
+#plt.plot(data_to_use.index, data_to_use['Energia consumo (kWh)'], label='Corrente (A)')
+plt.plot(data_to_use3.index, data_to_use3['Corrente (A)'], label='Corrente (A)')
+
+#plt.scatter(data_to_use[data_to_use['Anomaly'] == -1].index, data_to_use[data_to_use['Anomaly'] == -1]['Energia consumo (kWh)'], color='red', label='Anomalie')
+plt.scatter(data_to_use3[data_to_use3['Anomaly3'] == -1].index, data_to_use3[data_to_use3['Anomaly3'] == -1]['Corrente (A)'], color='blue', label='Anomalie')
+
+plt.title('Rilevamento delle Anomalie nella Corrente')
+plt.xlabel('Data')
+plt.ylabel('Corrente (A)')
+plt.legend()
+plt.show()
+
+#anomalie compressore 4
+plt.figure(figsize=(20, 10))
+#plt.plot(data_to_use.index, data_to_use['Energia consumo (kWh)'], label='Corrente (A)')
+plt.plot(data_to_use4.index, data_to_use4['Corrente (A)'], label='Corrente (A)')
+
+#plt.scatter(data_to_use[data_to_use['Anomaly'] == -1].index, data_to_use[data_to_use['Anomaly'] == -1]['Energia consumo (kWh)'], color='red', label='Anomalie')
+plt.scatter(data_to_use4[data_to_use4['Anomaly4'] == -1].index, data_to_use4[data_to_use4['Anomaly4'] == -1]['Corrente (A)'], color='black', label='Anomalie')
+
+plt.title('Rilevamento delle Anomalie nella Corrente')
+plt.xlabel('Data')
+plt.ylabel('Corrente (A)')
+plt.legend()
+plt.show()
