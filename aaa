@@ -98,6 +98,7 @@ data_to_use4['Anomaly3'] = model4.predict(data_scaled3)
 data_to_use4
 
 
+
 #Creazione del dataframe finale con le varie anomalie
 # Lista dei dataset
 datasets = [data_to_use1, data_to_use2, data_to_use3, data_to_use4]
