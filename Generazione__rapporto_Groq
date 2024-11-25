@@ -1,0 +1,49 @@
+!pip install groq
+
+prime_10_anomalie = anomalie.head(10)
+prime_10_anomalie
+
+import os
+from groq import Groq
+
+cliente = Groq(
+    api_key="Groq-api-key"
+)
+
+from transformers import pipeline
+from google.colab import drive
+drive.mount('/content/drive')
+pdf_path_groq='/content/drive/MyDrive/Tesi/ambassador_estrazione_30-06-2024_4mesi_oraria/Prove//ManualeRiassunto.pdf'
+
+# Funzione per estrarre testo da un PDF
+def extract_text_from_pdf(pdf_path_groq):
+    with open(pdf_path_groq, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+    return text
+
+pdf_tex_groq = extract_text_from_pdf(pdf_path_groq)
+def genera_rapporto_groq(prime_10_anomalie):
+
+    # Crea un prompt per il LLM basato sulle anomalie rilevate
+    anomalies_info = f"Sei l'assistente ai di un'azienda,utilizzando il manuale di questo machinario:\n{pdf_tex_groq} analizza le seguenti anomalie nei dati di questo compressore:\n{prime_10_anomalie.to_string()}\nFornisci approfondimenti sulle potenziali cause e raccomandazioni per la manutenzione preventiva."
+    prompt=anomalies_info
+
+
+    chat_completion = cliente.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": prompt,
+        }
+    ],
+    temperature=0.6,
+    max_tokens=1500,
+    model="llama-3.1-8b-instant",
+)
+    return chat_completion.choices[0].message.content
+    # Genera un rapporto basato sulle anomalie rilevate
+rapporto = genera_rapporto_groq(prime_10_anomalie)
+print(rapporto)
