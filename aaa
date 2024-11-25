@@ -1,1 +1,135 @@
+# Selezione delle colonne di interesse
+columns = ['Corrente (A)', 'Energia consumo (kWh)', 'Tensione (V)']
 
+data_to_use1 = data1[columns]
+data_to_use2 = data2[columns]
+data_to_use3 = data3[columns]
+data_to_use4 = data4[columns]
+
+data_to_use1
+
+#scalatura dei dataset
+
+datasets = [data_to_use1, data_to_use2, data_to_use3, data_to_use4]
+scaled_datasets = []
+
+# Configura l'imputer e lo scaler
+imputer = SimpleImputer(strategy='mean')
+scaler = StandardScaler()
+
+# Ciclo per applicare l'imputazione e la standardizzazione
+for i, data in enumerate(datasets, 1):
+    data_imputed = imputer.fit_transform(data)  # Applica l'imputazione
+    data_scaled = scaler.fit_transform(data_imputed)  # Applica la standardizzazione
+
+    scaled_datasets.append(data_scaled)  # Salva il dataset scalato nella lista
+    print(f"Dataset {i} scaled:")
+    print(data_scaled[:5])  # Visualizza le prime righe del dataset scalato
+
+# Assegna i dataset scalati a variabili separate
+data_scaled1, data_scaled2, data_scaled3, data_scaled4 = scaled_datasets
+
+#addestramento e predizionin dei vari modelli 
+# Creare e addestrare il modello relatico al comprssore 1
+
+model1 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+model1.fit(data_scaled1)
+
+
+# Predire le anomalie
+data_to_use1['Anomaly2'] = model1.predict(data_scaled2)
+data_to_use1['Anomaly3'] = model1.predict(data_scaled3)
+data_to_use1['Anomaly4'] = model1.predict(data_scaled4)
+data_to_use1
+
+
+# Creare e addestrare il modello relativo al compressore 2
+model2 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+
+model2.fit(data_scaled2)
+
+
+# Predire le anomalie
+data_to_use2['Anomaly1'] = model2.predict(data_scaled1)
+data_to_use2['Anomaly3'] = model2.predict(data_scaled3)
+data_to_use2['Anomaly4'] = model2.predict(data_scaled4)
+data_to_use2
+
+# Creare e addestrare il modello relativo al compressore 3
+model3 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+model3.fit(data_scaled3)
+
+
+# Predire le anomalie
+data_to_use3['Anomaly1'] = model3.predict(data_scaled1)
+data_to_use3['Anomaly2'] = model3.predict(data_scaled2)
+data_to_use3['Anomaly4'] = model3.predict(data_scaled4)
+data_to_use3
+
+# Creare e addestrare il modello relativo al compressore 4
+model4 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+
+model4.fit(data_scaled4)
+
+# Predire le anomalie
+data_to_use4['Anomaly1'] = model4.predict(data_scaled1)
+data_to_use4['Anomaly2'] = model4.predict(data_scaled2)
+data_to_use4['Anomaly3'] = model4.predict(data_scaled3)
+data_to_use4
+
+
+#Creazione del dataframe finale con le varie anomalie
+# Lista dei dataset
+datasets = [data_to_use1, data_to_use2, data_to_use3, data_to_use4]
+
+# Loop per creare le colonne di anomalia incrociate
+for i, data in enumerate(datasets, 1):
+    # Nome della colonna di anomalia da creare in questo dataset
+    target_anomaly_col = f"Anomaly{i}"
+
+    # Lista per memorizzare i risultati della nuova colonna
+    anomaly_results = []
+
+    # Itera su ogni riga del dataset corrente
+    for idx in range(len(data)):
+        # Valori di 'AnomalyX' dagli altri dataset per la riga corrente
+        other_values = []
+        for j, other_data in enumerate(datasets):
+            if j != i - 1:  # Esclude il dataset corrente
+                # Assicurati di accedere alla riga corretta dell'altro dataset
+                if target_anomaly_col in other_data.columns:
+                    value = other_data.iloc[idx][target_anomaly_col]
+                    other_values.append(value)
+
+        # Controllo che verifica i valori -1 e assegna il valore a seconda del conteggio
+        if other_values.count(-1) >= 2:
+            anomaly_results.append(-1)
+        else:
+            anomaly_results.append(1)
+
+    # Aggiungi i risultati come nuova colonna nel dataset corrente
+    data[target_anomaly_col] = anomaly_results
+
+    # Visualizza la colonna appena creata
+    print(f"Dataset {i} con colonna {target_anomaly_col} aggiornata:")
+    print(data[[target_anomaly_col]].head())
