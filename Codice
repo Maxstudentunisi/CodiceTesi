@@ -1,0 +1,200 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+import datetime
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+import matplotlib.pyplot as plt
+
+plt.style.use("ggplot") # Set plot style
+#%matplotlib inline
+
+
+from google.colab import drive
+drive.mount('/content/drive')
+import pandas as pd
+data1 = pd.read_excel('/content/drive/MyDrive/Tesi/ambassador_estrazione_30-06-2024_4mesi_oraria/Prove/Compressore 1 corretto.xlsx')
+data2 = pd.read_excel('/content/drive/MyDrive/Tesi/ambassador_estrazione_30-06-2024_4mesi_oraria/Prove/Compressore 2 corretto.xlsx')
+data3 = pd.read_excel('/content/drive/MyDrive/Tesi/ambassador_estrazione_30-06-2024_4mesi_oraria/Prove/Compressore 3 corretto.xlsx')
+data4 = pd.read_excel('/content/drive/MyDrive/Tesi/ambassador_estrazione_30-06-2024_4mesi_oraria/Prove/Compressore 4 corretto.xlsx')
+
+data1.head()
+data2.head()
+data3.head()
+data4.head()
+
+datasets = [data1, data2, data3, data4]
+
+for i, data in enumerate(datasets, 1):
+    data.rename(columns={data.columns[0]: 'Date'}, inplace=True)
+    data['Date'] = pd.to_datetime(data['Date'])
+    data.set_index('Date', inplace=True)
+    print(f"Dataset {i}:")
+    print(data.head())  # Visualizza le prime righe del dataset modificato
+
+
+datasets = [data1, data2, data3, data4]
+
+for i, data in enumerate(datasets, 1):
+    data = data.reset_index()
+    data["Date"] = pd.to_datetime(data["Date"])
+    datasets[i-1] = data  # Aggiorna il dataset nella lista se vuoi che le modifiche si riflettano
+
+    print(f"Dataset {i}:")
+    print(data.head())
+
+
+for i, data in enumerate(datasets, 1):
+  data = data.reset_index()
+  data["Date"] = pd.to_datetime(data["Date"])
+
+
+for i, data in enumerate(datasets, 1):
+    # Ensure 'Date' column exists and is of datetime type before proceeding.
+  if 'Date' not in data.columns:
+    # If missing in any dataframe, you may want to stop execution, fix input, or skip, depending on use case.
+    raise KeyError(f"DataFrame {i} is missing a 'Date' column")
+  data['Date'] = pd.to_datetime(data['Date'])
+  data["Hour"] = data["Date"].dt.hour
+  data["Day"] = data["Date"].dt.dayofweek
+  data["Month"] = data["Date"].dt.month
+  data["Year"] = data["Date"].dt.year
+  data["Q"] = data["Date"].dt.quarter
+  data["Dayofyear"] = data["Date"].dt.dayofyear
+  data["Dayofmonth"] = data["Date"].dt.day
+
+for i, data in enumerate(datasets, 1):
+    # Ensure 'Date' column exists and is of datetime type before proceeding.
+  if 'Date' not in data.columns:
+    data["Drop_me"] = data["Date"].dt.strftime("%m-%d")
+
+    data.index = data["Date"]
+    data = data.drop(["Date"],axis=1)
+
+for i, data in enumerate(datasets, 1):
+    # Creazione del grafico per il dataset corrente
+    data['Corrente (A)'].plot(kind='line', figsize=(10,5), title='Corrente (A)', label=f'Dataset {i}')
+
+    # Rimozione delle spine superiori e destra
+    plt.gca().spines[['top', 'right']].set_visible(False)
+
+# Aggiunta della legenda per ogni dataset
+plt.legend()
+
+  #plot corrente compressore1
+  data1['Corrente (A)'].plot(kind='line', figsize=(8, 4), title='Corrente (A) ')
+  plt.gca().spines[['top', 'right']].set_visible(False)
+
+  #plot corrente compressore2
+  data2['Corrente (A)'].plot(kind='line', figsize=(8, 4), title='Corrente (A) ')
+  plt.gca().spines[['top', 'right']].set_visible(False)
+
+  #plot corrente compressore3
+  data3['Corrente (A)'].plot(kind='line', figsize=(8, 4), title='Corrente (A) ')
+  plt.gca().spines[['top', 'right']].set_visible(False)
+
+  #plot corrente compressore4
+  data4['Corrente (A)'].plot(kind='line', figsize=(8, 4), title='Corrente (A) ')
+  plt.gca().spines[['top', 'right']].set_visible(False)
+
+  #Selezione delle colonne di interesse
+  columns = ['Corrente (A)', 'Energia consumo (kWh)', 'Tensione (V)']
+
+  data_to_use1 = data1[columns]
+  data_to_use2 = data2[columns]
+  data_to_use3 = data3[columns]
+  data_to_use4 = data4[columns]
+
+  data_to_use1
+
+#scalatura dei dataset
+
+datasets = [data_to_use1, data_to_use2, data_to_use3, data_to_use4]
+scaled_datasets = []
+
+# Configura l'imputer e lo scaler
+imputer = SimpleImputer(strategy='mean')
+scaler = StandardScaler()
+
+# Ciclo per applicare l'imputazione e la standardizzazione
+for i, data in enumerate(datasets, 1):
+    data_imputed = imputer.fit_transform(data)  # Applica l'imputazione
+    data_scaled = scaler.fit_transform(data_imputed)  # Applica la standardizzazione
+
+    scaled_datasets.append(data_scaled)  # Salva il dataset scalato nella lista
+    print(f"Dataset {i} scaled:")
+    print(data_scaled[:5])  # Visualizza le prime righe del dataset scalato
+
+# Assegna i dataset scalati a variabili separate
+data_scaled1, data_scaled2, data_scaled3, data_scaled4 = scaled_datasets
+
+
+# Creare e addestrare il modello relativo al compressore1
+model1 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+
+model1.fit(data_scaled1)
+# Predire le anomalie
+data_to_use1['Anomaly2'] = model1.predict(data_scaled2)
+data_to_use1['Anomaly3'] = model1.predict(data_scaled3)
+data_to_use1['Anomaly4'] = model1.predict(data_scaled4)
+data_to_use1
+
+# Creare e addestrare il modello relativo al compressore2 
+model2 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+
+model2.fit(data_scaled2)
+
+# Predire le anomalie
+data_to_use2['Anomaly1'] = model2.predict(data_scaled1)
+data_to_use2['Anomaly3'] = model2.predict(data_scaled3)
+data_to_use2['Anomaly4'] = model2.predict(data_scaled4)
+data_to_use2
+
+# Creare e addestrare il modello relativo al compressore3
+model3 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+
+model3.fit(data_scaled3)
+#model.fit(train_data)
+#predizioni = model.predict(data_scaled)
+# Predire le anomalie
+data_to_use3['Anomaly1'] = model3.predict(data_scaled1)
+data_to_use3['Anomaly2'] = model3.predict(data_scaled2)
+data_to_use3['Anomaly4'] = model3.predict(data_scaled4)
+data_to_use3
+
+# Creare e addestrare il modello relativo al compressore 4 
+model4 = IsolationForest(
+    n_estimators=150,
+    contamination=0.05,  # Prova valori come 0.05, 0.1, 0.15
+    max_samples='auto',
+    random_state=42
+)
+
+model4.fit(data_scaled4)
+
+#predizioni = model.predict(data_scaled)
+# Predire le anomalie
+data_to_use4['Anomaly1'] = model4.predict(data_scaled1)
+data_to_use4['Anomaly2'] = model4.predict(data_scaled2)
+data_to_use4['Anomaly3'] = model4.predict(data_scaled3)
+data_to_use4
+
+
+
