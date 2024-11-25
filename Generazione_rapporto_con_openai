@@ -1,0 +1,51 @@
+#seleziono le anomalie del compressore 4
+anomalie = data_to_use4[data_to_use4['Anomaly4'] == -1]['Anomaly4']
+
+print(len(anomalie))
+anomalie
+
+#seleziono solo le prime 10
+prime_10_anomalie = anomalie.head(10)
+prime_10_anomalie
+
+from openai import OpenAI
+
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key='your-openai-key'
+)
+#Generazione del rapporto con openai
+pdf_text = extract_text_from_pdf(pdf_path)
+
+def genera_rapporto(prime_10_anomalie):
+
+
+    # Crea un prompt per il LLM basato sulle anomalie rilevate
+    anomalies_info = f"Sei l'assistente ai di un'azienda,utilizzando il manuale di questo machinario:\n{pdf_text} analizza le seguenti anomalie nei dati di questo compressore:\n{prime_10_anomalie.to_string()}\nFornisci approfondimenti sulle potenziali cause e raccomandazioni per la manutenzione preventiva."
+    prompt=anomalies_info
+   # response_OLD = openai.Completion.create(
+     #   engine="gpt-4o-mini",  # o "gpt-4" se disponibile
+       # messages=[{"role": "user", "content": prompt}],
+      #  max_tokens=300,  # Limita la risposta a 300 token
+      #  temperature=0.1
+    #)
+
+    response = client.chat.completions.create(
+    messages=[
+        {
+            "role": "assistant",#scrivere chi sei, es assistente ai che utilizza i dati per fare l'analisi
+            "content": prompt,
+        }
+    ],
+    model="gpt-4o-mini",
+    temperature=0.8,
+    max_tokens=1500
+    )
+
+    return response.choices[0].message.content
+
+# Genera un rapporto basato sulle anomalie rilevate
+rapporto = genera_rapporto(prime_10_anomalie)
+print(rapporto)
+
+
