@@ -73,6 +73,90 @@ for i, data in enumerate(datasets, 1):
     data.index = data["Date"]
     data = data.drop(["Date"],axis=1)
 
+#visualizzazione della distribuzione del consumo di corrente
+# Supponiamo che 'data["Corrente (A)"]' contenga i dati da plottare
+ax, fig = plt.subplots(figsize=(15, 5))
+
+plt.hist(data1["Corrente (A)"], bins=80)  # Puoi modificare il numero di bins in base ai tuoi dati
+
+# Cambia la scala dell'asse x
+x_ticks = np.arange(min(data1["Corrente (A)"]), max(data1["Corrente (A)"]), 10)
+plt.xticks(x_ticks, alpha=0.75, weight="bold")
+
+# Cambia l'aspetto degli altri assi
+plt.yticks(alpha=0.75, weight="bold")
+plt.xlabel("", alpha=0.75, weight="bold")
+plt.ylabel("", alpha=0.75, weight="bold")
+
+# Imposta il titolo
+plt.title("Consumption distribution", alpha=0.60, weight="bold", fontsize=10, loc="left", pad=10)
+
+plt.show()
+
+
+
+#visualizzazione trimestrale dei consumi
+#Data prep
+Q1 = data1[data1["Q"]==1]
+Q2 = data1[data1["Q"]==2]
+Q3 = data1[data1["Q"]==3]
+Q4 = data1[data1["Q"]==4]
+
+#Plot
+fig,axes = plt.subplots(2,2,figsize=(17,7),sharex=True,sharey=True)
+
+sns.histplot(Q1["Corrente (A)"],color="skyblue", kde=True, ax=axes[0,0]).set_title("Q1 - Consumption")
+sns.histplot(Q2["Corrente (A)"],color="orange", kde=True, ax=axes[0,1]).set_title("Q2 - Consumption")
+sns.histplot(Q3["Corrente (A)"],color="green", kde=True, ax=axes[1,0]).set_title("Q3 - Consumption")
+sns.histplot(Q4["Corrente (A)"],color="red", kde=True, ax=axes[1,1]).set_title("Q4 - Consumption")
+
+del Q1, Q2, Q3, Q4
+
+
+
+#media giornaliera dei consumi 
+#Data prep
+mean_per_day = data1.groupby("Day")["Corrente (A)"].agg(["mean"])
+#Plot
+fig, ax = plt.subplots(figsize=(10,5))
+
+
+plt.plot(mean_per_day.index,mean_per_day["mean"])
+
+plt.xticks(mean_per_day.index, ["Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday","Sunday"], alpha=0.75, weight="bold")
+plt.yticks(alpha=0.75, weight="bold")
+
+plt.xlabel("Day of the week",alpha=0.75, weight="bold")
+plt.ylabel("Mean consumption",alpha=0.75, weight="bold")
+
+plt.title("Mean daily consumption", alpha=0.60, weight="bold", fontsize=15, loc="left", pad=10)
+
+#del mean_per_day
+
+
+
+
+
+#distribuzione media oraria dei consumi di corrente
+#Data
+mean_per_hour = data1.groupby("Hour")["Corrente (A)"].agg(["mean"])
+
+#Plot
+fig, ax = plt.subplots(figsize=(10,5))
+
+plt.bar(mean_per_hour.index, mean_per_hour["mean"])
+
+plt.xticks(range(24),alpha=0.75, weight="bold")
+plt.yticks(alpha=0.75, weight="bold")
+
+plt.xlabel("Hour",alpha=0.75, weight="bold")
+plt.ylabel("Mean consumption",alpha=0.75, weight="bold")
+
+plt.title("Mean hourly consumption", alpha=0.60, weight="bold", fontsize=15, loc="left", pad=10)
+
+del mean_per_hour
+
+
 for i, data in enumerate(datasets, 1):
     # Creazione del grafico per il dataset corrente
     data['Corrente (A)'].plot(kind='line', figsize=(10,5), title='Corrente (A)', label=f'Dataset {i}')
