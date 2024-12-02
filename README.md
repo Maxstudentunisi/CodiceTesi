@@ -1,9 +1,9 @@
 Questa cartella comprende tutto il codice per lo sviluppo di questo progetto, suddiviso per parti.
 Qui sotto sono specificate tutte le librerie che sono state installate con le relative versioni.
-pandas: Version: 2.2.2
-NumPy Version: 1.26.4
-matplotlib  Version: 3.8.0
-scikit-learn Version: 1.5.2
+-pandas: Version: 2.2.2
+-NumPy Version: 1.26.4
+-matplotlib  Version: 3.8.0
+-scikit-learn Version: 1.5.2
 
 
 Package                            Version
