@@ -8,8 +8,8 @@ Qui sotto sono specificate tutte le librerie che sono state installate con le re
 
 Package                            Version
 ---------------------------------- -------------------
-absl-py                            1.4.0
-accelerate                         1.1.1
+- absl-py                            1.4.0
+- accelerate                         1.1.1
 aiohappyeyeballs                   2.4.3
 aiohttp                            3.11.2
 aiosignal                          1.3.1
